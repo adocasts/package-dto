@@ -1,0 +1,6 @@
+{{{
+  exports({
+    to: dto.exportPath
+  })
+}}}
+export default class {{ dto.className }} {}
