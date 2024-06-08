@@ -1,115 +1,292 @@
-# AdonisJS package starter kit
+# @adocasts.com/dto
 
-> A boilerplate for creating AdonisJS packages
+> Easily make and generate DTOs from Lucid Models
 
-This repo provides you with a starting point for creating AdonisJS packages. Of course, you can create a package from scratch with your folder structure and workflow. However, using this starter kit can speed up the process, as you have fewer decisions to make.
+Converting Lucid Models to DTO files can be a tedious task. 
+This package aims to make it a little less so, 
+by reading your model's property definitions and porting them to a DTO-safe format.
+Will it be perfect? Likely not, but it should help cut back on the 
+repetition needed to complete the task.
 
-## Setup
-
-- Clone the repo on your computer, or use `giget` to download this repo without the Git history.
-  ```sh
-  npx giget@latest gh:adonisjs/pkg-starter-kit
-  ```
-- Install dependencies.
-- Update the `package.json` file and define the `name`, `description`, `keywords`, and `author` properties.
-- The repo is configured with an MIT license. Feel free to change that if you are not publishing under the MIT license.
-
-## Folder structure
-
-The starter kit mimics the folder structure of the official packages. Feel free to rename files and folders as per your requirements.
-
+## Installation
+You can easily install and configure via the Ace CLI's `add` command.
+```shell
+node ace add @adocasts.com/dto
 ```
-├── providers
-├── src
-├── bin
-├── stubs
-├── configure.ts
-├── index.ts
-├── LICENSE.md
-├── package.json
-├── README.md
-├── tsconfig.json
-├── tsnode.esm.js
+##### Manual Install & Configure
+You can also manually install and configure if you'd prefer
+```shell
+npm install @adocasts.com/dto
+```
+```shell
+node ace configure @adocasts.com/dto
 ```
 
-- The `configure.ts` file exports the `configure` hook to configure the package using the `node ace configure` command.
-- The `index.ts` file is the main entry point of the package.
-- The `tsnode.esm.js` file runs TypeScript code using TS-Node + SWC. Please read the code comment in this file to learn more.
-- The `bin` directory contains the entry point file to run Japa tests.
-- Learn more about [the `providers` directory](./providers/README.md).
-- Learn more about [the `src` directory](./src/README.md).
-- Learn more about [the `stubs` directory](./stubs/README.md).
+## Generate DTOs Command
+Want to generate DTOs for all your models in one fell swoop? This is the command for you!
+```shell
+node ace generate:dtos
+```
+This will read all of your model files, collecting their properties and types.
+It'll then convert those property's types into serialization-safe types 
+and relationships into their DTO representations.
 
-### File system naming convention
+```
+File Tree                       Class
+------------------------------------------------
+└── app/
+    ├── dtos/
+    │   ├── account.ts          AccountDto
+    │   ├── account_group.ts    AccountGroupDto
+    │   ├── account_type.ts     AccountTypeDto
+    │   ├── income.ts           IncomeDto
+    │   ├── payee.ts            PayeeDto
+    │   └── user.ts             UserDto
+    └── models/
+        ├── account.ts          Account
+        ├── account_group.ts    AccountGroup
+        ├── account_type.ts     AccountType
+        ├── income.ts           Income
+        ├── payee.ts            Payee
+        └── user.ts             User
+```
 
-We use `snake_case` naming conventions for the file system. The rule is enforced using ESLint. However, turn off the rule and use your preferred naming conventions.
+- Gets a list of your model files from the location defined within your `adonisrc.ts` file
+- Reads those files as plaintext, filering down to just property definitions
+- Determines the property name, it's types, whether it's a relationship, and if it's optionally modified `?`
+- Converts those model types into serialized representations (currently a very loose conversion)
+  - Note, at present, this does not account for serialization behaviors defined on the model property (like `serializeAs`)
+- Creates DTO property definitions from those conversions
+- Prepares constructor value setters for each property
+- Collects needed imports for relationships
+- Generates the DTO file
+  - Note, if a file already exists at the DTOs determined location it will be skipped
 
-## Peer dependencies
+## Make DTO Command
+Want to make a plain DTO file, or a single DTO from a single Model? This is the command for you!
 
-The starter kit has a peer dependency on `@adonisjs/core@6`. Since you are creating a package for AdonisJS, you must make it against a specific version of the framework core.
+To make a DTO named `AccountDto` within a file located at `dto/account.ts`, we can run the following:
+```shell
+node ace make:dto account
+```
+This will check to see if there is a model named `Account`. 
+If a model is found, it will use that model's property definitions to generate the `AccountDto`.
+Otherwise, it'll generate just a `AccountDto` file with an empty class inside it.
+```
+File Tree                       Class
+------------------------------------------------
+└── app/
+    ├── dtos/
+    │   ├── account.ts          AccountDto
+    └── models/
+        ├── account.ts          Account
+```
 
-If your package needs Lucid to be functional, you may install `@adonisjs/lucid` as a development dependency and add it to the list of `peerDependencies`.
+### What If There Isn't An Account Model?
+As mentioned above, a plain `AccountDto` class will be generated within a new `dto/account.ts` file, which will look like the below.
+```ts
+export default class AccountDto {}
+```
 
-As a rule of thumb, packages installed in the user application should be part of the `peerDependencies` of your package and not the main dependency.
+#### Specifying A Different Model
+If the DTO and Model names don't match, you can specify a specific Model to use via the `--model` flag.
+```shell
+node ace make:dto account --model=main_account
+```
+Now instead of looking for a model named `Account` it'll instead 
+look for `MainAccount` and use it to create a DTO named `AccountDto`.
 
-For example, if you install `@adonisjs/core` as a main dependency, then essentially, you are importing a separate copy of `@adonisjs/core` and not sharing the one from the user application. Here is a great article explaining [peer dependencies](https://blog.bitsrc.io/understanding-peer-dependencies-in-javascript-dbdb4ab5a7be).
+## Things To Note
+- At present we assume the Model's name from the file name of the model.
+- There is NOT currently a setting to change the output directory of the DTOs
+- Due to reflection limitations, we're reading Models as plaintext. I'm no TypeScript wiz, so if you know of a better approach, I'm all ears!
+  - Since we're reading as plaintext
+    - Currently we're omitting decorators and their options
 
-## Published files
+## Example
+So, we've use account as our example throughout this guide, 
+so let's end by taking a look at what this Account Model looks like!
 
-Instead of publishing your repo's source code to npm, you must cherry-pick files and folders to publish only the required files.
+##### The Account Model
+```ts
+// app/models/account.ts
 
-The cherry-picking uses the `files` property inside the `package.json` file. By default, we publish the following files and folders.
+import { DateTime } from 'luxon'
+import { BaseModel, belongsTo, column, computed, hasMany, hasOne } from '@adonisjs/lucid/orm'
+import User from './user.js'
+import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
+import AccountType from '#models/account_type'
+import Payee from '#models/payee'
+import Stock from '#models/stock'
+import Transaction from '#models/transaction'
+import AccountTypeService from '#services/account_type_service'
+import { columnCurrency } from '#start/orm/column'
+import type { AccountGroupConfig } from '#config/account'
 
-```json
-{
-  "files": ["build/src", "build/providers", "build/stubs", "build/index.d.ts", "build/index.js"]
+export default class Account extends BaseModel {
+  // region Columns
+
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare userId: number
+
+  @column()
+  declare accountTypeId: number
+
+  @column()
+  declare name: string
+
+  @column()
+  declare note: string
+
+  @column.date()
+  declare dateOpened: DateTime | null
+
+  @column.date()
+  declare dateClosed: DateTime | null
+
+  @columnCurrency()
+  declare balance: number
+
+  @columnCurrency()
+  declare startingBalance: number
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+
+  // endregion
+
+  // region Unmapped Properties
+
+  aggregations: Record<string, number> = {}
+
+  // endregion
+
+  // region Relationships
+
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
+
+  @belongsTo(() => AccountType)
+  declare accountType: BelongsTo<typeof AccountType>
+
+  @hasOne(() => Payee)
+  declare payee: HasOne<typeof Payee>
+
+  @hasMany(() => Stock)
+  declare stocks: HasMany<typeof Stock>
+
+  @hasMany(() => Transaction)
+  declare transactions: HasMany<typeof Transaction>
+
+  // endregion
+
+  // region Computed Properties
+
+  @computed()
+  get accountGroup(): AccountGroupConfig {
+    return AccountTypeService.getAccountTypeGroup(this.accountTypeId)
+  }
+
+  @computed()
+  get isCreditIncrease(): boolean {
+    return AccountTypeService.isCreditIncreaseById(this.accountTypeId)
+  }
+
+  @computed()
+  get isBudgetable() {
+    return AccountTypeService.isBudgetable(this.accountTypeId)
+  }
+
+  @computed()
+  get balanceDisplay() {
+    return '$' + this.balance.toLocaleString('en-US')
+  }
+
+  // endregion
 }
+
+```
+It's got 
+- Column properties 
+- Nullable properties
+- An unmapped property, which also contains a default value
+- Getters 
+- Relationships
+
+Let's see what we get when we generate our DTO!
+```shell
+node ace make:dto account
 ```
 
-If you create additional folders or files, mention them inside the `files` array.
+##### The Account DTO
+```ts
+import Account from '#models/account'
+import UserDto from '#dtos/user'
+import AccountTypeDto from '#dtos/account_type'
+import PayeeDto from '#dtos/payee'
+import StockDto from '#dtos/stock'
+import TransactionDto from '#dtos/transaction'
 
-## Exports
+export default class AccountDto {
+  declare id: number
+  declare userId: number
+  declare accountTypeId: number
+  declare name: string
+  declare note: string
+  declare dateOpened: string | null
+  declare dateClosed: string | null
+  declare balance: number
+  declare startingBalance: number
+  declare createdAt: string
+  declare updatedAt: string
+  aggregations: Record<string, number> = {}
+  declare user: UserDto | null
+  declare accountType: AccountTypeDto | null
+  declare payee: PayeeDto | null
+  declare stocks: StockDto[]
+  declare transactions: TransactionDto[]
 
-[Node.js Subpath exports](https://nodejs.org/api/packages.html#subpath-exports) allows you to define the exports of your package regardless of the folder structure. This starter kit defines the following exports.
+  constructor(account: Account) {
+    this.id = account.id
+    this.userId = account.userId
+    this.accountTypeId = account.accountTypeId
+    this.name = account.name
+    this.note = account.note
+    this.dateOpened = account.dateOpened?.toISO()!
+    this.dateClosed = account.dateClosed?.toISO()!
+    this.balance = account.balance
+    this.startingBalance = account.startingBalance
+    this.createdAt = account.createdAt.toISO()!
+    this.updatedAt = account.updatedAt.toISO()!
+    this.aggregations = account.aggregations
+    this.user = account.user && new UserDto(account.user)
+    this.accountType = account.accountType && new AccountTypeDto(account.accountType)
+    this.payee = account.payee && new PayeeDto(account.payee)
+    this.stocks = StockDto.fromArray(account.stocks)
+    this.transactions = TransactionDto.fromArray(account.transactions)
+  }
 
-```json
-{
-  "exports": {
-    ".": "./build/index.js",
-    "./types": "./build/src/types.js"
+  static fromArray(accounts: Account[]) {
+    if (!accounts) return []
+    return accounts.map((account) => new AccountDto(account))
   }
 }
 ```
 
-- The dot `.` export is the main export.
-- The `./types` exports all the types defined inside the `./build/src/types.js` file (the compiled output).
+It's got the
+- Needed imports (it'll try to get them all by also referencing the Model's imports)
+- Column properties from our Model
+- Nullable property's nullability
+- Unmapped property from our Model, plus it's default value
+- Relationships converted into DTO representations
+- Constructor value setters for all of the above
+- A helper method `fromArray` that'll normalize to an empty array if need be
 
-Feel free to change the exports as per your requirements.
-
-## Testing
-
-We configure the [Japa test runner](https://japa.dev/) with this starter kit. Japa is used in AdonisJS applications as well. Just run one of the following commands to execute tests.
-
-- `npm run test`: This command will first lint the code using ESlint and then run tests and report the test coverage using [c8](https://github.com/bcoe/c8).
-- `npm run quick:test`: Runs only the tests without linting or coverage reporting.
-
-The starter kit also has a Github workflow file to run tests using Github Actions. The tests are executed against `Node.js 20.x` and `Node.js 21.x` versions on both Linux and Windows. Feel free to edit the workflow file in the `.github/workflows` directory.
-
-## TypeScript workflow
-
-- The starter kit uses [tsc](https://www.typescriptlang.org/docs/handbook/compiler-options.html) for compiling the TypeScript to JavaScript when publishing the package.
-- [TS-Node](https://typestrong.org/ts-node/) and [SWC](https://swc.rs/) are used to run tests without compiling the source code.
-- The `tsconfig.json` file is extended from [`@adonisjs/tsconfig`](https://github.com/adonisjs/tooling-config/tree/main/packages/typescript-config) and uses the `NodeNext` module system. Meaning the packages are written using ES modules.
-- You can perform type checking without compiling the source code using the `npm run type check` script.
-
-Feel free to explore the `tsconfig.json` file for all the configured options.
-
-## ESLint and Prettier setup
-
-The starter kit configures ESLint and Prettier. Both configurations are stored within the `package.json` file and use our [shared config](https://github.com/adonisjs/tooling-config/tree/main/packages). Feel free to change the configuration, use custom plugins, or remove both tools altogether.
-
-## Using Stale bot
-
-The [Stale bot](https://github.com/apps/stale) is a Github application that automatically marks issues and PRs as stale and closes after a specific duration of inactivity.
-
-Feel free to delete the `.github/stale.yml` and `.github/lock.yml` files if you decide not to use the Stale bot.
+What it doesn't have
+- The getters, we're working on it though.

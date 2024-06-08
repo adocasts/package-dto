@@ -9,13 +9,14 @@ import {{ model.name }} from '#models/{{ string.snakeCase(model.name) }}'
 {{ /each }}
 
 export default class {{ dto.className }} {{{ '{' }}}{{ #each dto.properties as property }}
-  declare {{ property.name }}: {{{ property.type }}}{{ /each }}
+  {{{ property.declaration }}}{{ /each }}
 
   constructor({{ model.variable }}: {{ model.name }}) {{{ '{' }}}{{ #each dto.properties as property }}
-    this.{{ property.name }} = {{ property.valueSetter }}{{ /each }}
+    this.{{ property.name }} = {{{ property.valueSetter }}}{{ /each }}
   }
 
   static fromArray({{ string.plural(model.variable) }}: {{ model.name }}[]) {
+    if (!{{ string.plural(model.variable) }}) return []
     return {{ string.plural(model.variable) }}.map(({{ model.variable }}) => new {{ dto.className }}({{ model.variable }}))
   }
 }

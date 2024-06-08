@@ -16,11 +16,18 @@ export type DtoProperty = {
   name: string
   type: string
   typeRaw: ModelPropertyType[]
+  declaration: string
   valueSetter: string
 }
 
 export default class DtoService {
   constructor(protected app: ApplicationService) {}
+
+  /**
+   * Get DTO file, class, and property info
+   * @param name
+   * @param model
+   */
   getDtoInfo(name: string, model: ModelInfo) {
     const entity = generators.createEntity(this.#getDtoName(name))
     const fileName = generators.modelFileName(entity.name).replace('_dto', '')
@@ -40,25 +47,50 @@ export default class DtoService {
     return data
   }
 
+  /**
+   * Normalize name of the DTO
+   * @param name
+   * @private
+   */
   #getDtoName(name: string) {
     return name.toLowerCase().endsWith('dto') ? name : name + '_dto'
   }
 
+  /**
+   * Get DTO's property, type, and constructor value setting info
+   * @param model
+   * @private
+   */
   #getDtoProperties(model: ModelInfo): DtoProperty[] {
     return model.properties.map((property) => {
-      const type = this.#getDtoType(property)
+      const typeRaw = this.#getDtoType(property)
+      const type = typeRaw.map((item) => item.dtoType || item.type).join(' | ')
       return {
         name: property.name,
-        type: type.map((item) => item.dtoType || item.type).join(' | '),
-        typeRaw: type,
+        type,
+        typeRaw: typeRaw,
+        declaration: this.#getPropertyDeclaration(property, type),
         valueSetter: this.#getValueSetter(property, model),
       }
     })
   }
 
+  /**
+   * Get normalized DTO types
+   * @param property
+   * @private
+   */
   #getDtoType(property: ModelProperty) {
     if (property.relation?.dtoType) {
-      return [property.relation]
+      const types = [property.relation]
+
+      // plural relationships will be normalized to empty array
+      // however, singular relationships may be null if not loaded/preloaded regardless of type
+      if (!property.relation.isPlural) {
+        types.push({ type: 'null' })
+      }
+
+      return types
     }
 
     return property.types.map(({ ...item }) => {
@@ -70,26 +102,43 @@ export default class DtoService {
     })
   }
 
+  /**
+   * get class declaration string for property
+   * @param property
+   * @param type
+   * @private
+   */
+  #getPropertyDeclaration(property: ModelProperty, type: string) {
+    if (!property.defaultValue) {
+      return `declare ${property.name}${property.isOptionallyModified ? '?' : ''}: ${type}`
+    }
+
+    return `${property.name}: ${type} = ${property.defaultValue}`
+  }
+
+  /**
+   * Get value setter for use in the constructor for the property
+   * @param property
+   * @param model
+   * @private
+   */
   #getValueSetter(property: ModelProperty, model: ModelInfo) {
+    const nullable = property.types.find((item) => item.type === 'null')
+    const optional = property.types.find((item) => item.type === 'optional')
     const accessor = `${model.variable}.${property.name}`
 
     if (property.relation?.model) {
       return property.relation.isPlural
         ? `${property.relation.dto}.fromArray(${accessor})`
-        : `new ${property.relation.dto}(${accessor})`
+        : `${accessor} && new ${property.relation.dto}(${accessor})`
     }
 
     const dateTimeType = property.types.find((item) => item.type === 'DateTime')
 
     if (dateTimeType) {
-      const nullable = property.types.find((item) => item.type === 'null')
-      const optional = property.types.find((item) => item.type === 'optional')
-
-      if (optional || nullable) {
-        return accessor + `?.toISO()${optional ? '' : '!'}`
-      }
-
-      return accessor + `.toISO()!`
+      return optional || nullable
+        ? accessor + `?.toISO()${optional ? '' : '!'}`
+        : accessor + `.toISO()!`
     }
 
     return accessor
