@@ -22,9 +22,6 @@ export default class FileService {
   static async readDeclarations(filePath: string) {
     const contents = await readFile(filePath, 'utf8')
     const fileLines = contents.split('\n')
-    // const definitions = fileLines.filter(
-    //   (line) => line.includes('declare ') || line.includes('public ') || line.includes('get ') ||
-    // )
     const classStartIndex = fileLines.findIndex((line) => line.includes(' extends BaseModel '))
     const classEndIndex = fileLines.findLastIndex((line) => string.condenseWhitespace(line) === '}')
 
@@ -35,14 +32,13 @@ export default class FileService {
     let isInBlock: boolean = false
     const definitions = classLines.filter((line) => {
       const propertyMatch = line.match(/^(declare |public |get |[0-9A-z])+/)
+      const isDefinition = propertyMatch && !isInBlock
 
       if (line.endsWith('{')) isInBlock = true
       if (line.startsWith('}') && isInBlock) isInBlock = false
 
-      return propertyMatch && !isInBlock
+      return isDefinition
     })
-
-    console.log({ classLines, definitions, classStartIndex, classEndIndex, fileLines })
 
     return { definitions, fileLines }
   }

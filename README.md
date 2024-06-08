@@ -232,6 +232,7 @@ import AccountTypeDto from '#dtos/account_type'
 import PayeeDto from '#dtos/payee'
 import StockDto from '#dtos/stock'
 import TransactionDto from '#dtos/transaction'
+import { AccountGroupConfig } from '#config/account'
 
 export default class AccountDto {
   declare id: number
@@ -251,6 +252,10 @@ export default class AccountDto {
   declare payee: PayeeDto | null
   declare stocks: StockDto[]
   declare transactions: TransactionDto[]
+  declare accountGroup: AccountGroupConfig
+  declare isCreditIncrease: boolean
+  declare isBudgetable: boolean
+  declare balanceDisplay: string
 
   constructor(account: Account) {
     this.id = account.id
@@ -270,6 +275,10 @@ export default class AccountDto {
     this.payee = account.payee && new PayeeDto(account.payee)
     this.stocks = StockDto.fromArray(account.stocks)
     this.transactions = TransactionDto.fromArray(account.transactions)
+    this.accountGroup = account.accountGroup
+    this.isCreditIncrease = account.isCreditIncrease
+    this.isBudgetable = account.isBudgetable
+    this.balanceDisplay = account.balanceDisplay
   }
 
   static fromArray(accounts: Account[]) {
@@ -285,8 +294,6 @@ It's got the
 - Nullable property's nullability
 - Unmapped property from our Model, plus it's default value
 - Relationships converted into DTO representations
+- Getters and their types, when specified. If types are inferred, the type will default to string or boolean if variable name starts with `is`
 - Constructor value setters for all of the above
 - A helper method `fromArray` that'll normalize to an empty array if need be
-
-What it doesn't have
-- The getters, we're working on it though.
