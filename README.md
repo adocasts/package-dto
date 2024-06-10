@@ -25,6 +25,14 @@ npm install @adocasts.com/dto
 node ace configure @adocasts.com/dto
 ```
 
+##### Define DTO Import Path
+The generated DTOs will use `#dtos/*` for relationship imports within the DTOs. 
+As such, we recommend defining this import path within your `package.json`
+```json
+"imports": {
+  "#dtos/*": "./app/dtos/*.js"
+}
+```
 ## Generate DTOs Command
 Want to generate DTOs for all your models in one fell swoop? This is the command for you!
 ```shell
