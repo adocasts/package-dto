@@ -1,7 +1,7 @@
 {
   "name": "@adocasts.com/dto",
-  "description": "",
-  "version": "0.0.0",
+  "description": "Easily make and generate DTOs from Lucid Models",
+  "version": "0.0.1",
   "engines": {
     "node": ">=20.6.0"
   },
@@ -36,9 +36,17 @@
     "prepublishOnly": "npm run build",
     "index:commands": "adonis-kit index build/commands"
   },
-  "keywords": [],
+  "keywords": ["adonisjs", "lucid", "dto", "generate", "make"],
   "author": "tomgobich,adocasts.com",
   "license": "MIT",
+  "homepage": "https://github.com/adocasts/package-dto#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adocasts/package-dto.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adocasts/package-dto/issues"
+  },
   "devDependencies": {
     "@adonisjs/assembler": "^7.2.3",
     "@adonisjs/core": "^6.3.1",

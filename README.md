@@ -2,9 +2,12 @@
 
 > Easily make and generate DTOs from Lucid Models
 
+
+[![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url]
+
 Converting Lucid Models to DTO files can be a tedious task. 
-This package aims to make it a little less so, 
-by reading your model's property definitions and porting them to a DTO-safe format.
+This package aims to make it a little less so
+by reading your model's property definitions and porting them to a DTO.
 Will it be perfect? Likely not, but it should help cut back on the 
 repetition needed to complete the task.
 
@@ -297,3 +300,14 @@ It's got the
 - Getters and their types, when specified. If types are inferred, the type will default to string or boolean if variable name starts with `is`
 - Constructor value setters for all of the above
 - A helper method `fromArray` that'll normalize to an empty array if need be
+
+[gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adocasts/package-dto/test.yml?style=for-the-badge
+[gh-workflow-url]: https://github.com/adocasts/package-dto/actions/workflows/test.yml "Github action"
+
+[npm-image]: https://img.shields.io/npm/v/@adocasts.com/dto/latest.svg?style=for-the-badge&logo=npm
+[npm-url]: https://www.npmjs.com/package/@adocasts.com/dto/v/latest "npm"
+
+[typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
+
+[license-url]: LICENSE.md
+[license-image]: https://img.shields.io/github/license/adocasts/package-dto?style=for-the-badge
