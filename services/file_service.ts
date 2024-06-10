@@ -22,7 +22,7 @@ export default class FileService {
   static async readDeclarations(filePath: string) {
     const contents = await readFile(filePath, 'utf8')
     const fileLines = contents.split('\n')
-    const classStartIndex = fileLines.findIndex((line) => line.includes(' extends BaseModel '))
+    const classStartIndex = fileLines.findIndex((line) => line.includes('export default class '))
     const classEndIndex = fileLines.findLastIndex((line) => string.condenseWhitespace(line) === '}')
 
     const classLines = fileLines
