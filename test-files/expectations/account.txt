@@ -1,0 +1,60 @@
+import Account from '#models/account'
+import UserDto from '#dtos/user'
+import AccountTypeDto from '#dtos/account_type'
+import PayeeDto from '#dtos/payee'
+import StockDto from '#dtos/stock'
+import TransactionDto from '#dtos/transaction'
+import { AccountGroupConfig } from '#config/account'
+
+export default class AccountDto {
+  declare id: number
+  declare userId: number
+  declare accountTypeId: number
+  declare name: string
+  declare note: string
+  declare dateOpened: string | null
+  declare dateClosed: string | null
+  declare balance: number
+  declare startingBalance: number
+  declare createdAt: string
+  declare updatedAt: string
+  aggregations: Record<string, number> = {}
+  declare user: UserDto | null
+  declare accountType: AccountTypeDto | null
+  declare payee: PayeeDto | null
+  declare stocks: StockDto[]
+  declare transactions: TransactionDto[]
+  declare accountGroup: AccountGroupConfig
+  declare isCreditIncrease: boolean
+  declare isBudgetable: boolean
+  declare balanceDisplay: string
+
+  constructor(account: Account) {
+    this.id = account.id
+    this.userId = account.userId
+    this.accountTypeId = account.accountTypeId
+    this.name = account.name
+    this.note = account.note
+    this.dateOpened = account.dateOpened?.toISO()!
+    this.dateClosed = account.dateClosed?.toISO()!
+    this.balance = account.balance
+    this.startingBalance = account.startingBalance
+    this.createdAt = account.createdAt.toISO()!
+    this.updatedAt = account.updatedAt.toISO()!
+    this.aggregations = account.aggregations
+    this.user = account.user && new UserDto(account.user)
+    this.accountType = account.accountType && new AccountTypeDto(account.accountType)
+    this.payee = account.payee && new PayeeDto(account.payee)
+    this.stocks = StockDto.fromArray(account.stocks)
+    this.transactions = TransactionDto.fromArray(account.transactions)
+    this.accountGroup = account.accountGroup
+    this.isCreditIncrease = account.isCreditIncrease
+    this.isBudgetable = account.isBudgetable
+    this.balanceDisplay = account.balanceDisplay
+  }
+
+  static fromArray(accounts: Account[]) {
+    if (!accounts) return []
+    return accounts.map((account) => new AccountDto(account))
+  }
+}

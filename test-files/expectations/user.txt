@@ -1,0 +1,39 @@
+import User from '#models/user'
+import PayeeDto from '#dtos/payee'
+import TransactionDto from '#dtos/transaction'
+import IncomeDto from '#dtos/income'
+import StockPurchaseDto from '#dtos/stock_purchase'
+import StockDto from '#dtos/stock'
+
+export default class UserDto {
+  declare id: number
+  declare fullName: string | null
+  declare email: string
+  declare password: string
+  declare createdAt: string
+  declare updatedAt: string | null
+  declare payees: PayeeDto[]
+  declare transactions: TransactionDto[]
+  declare incomes: IncomeDto[]
+  declare stockPurchases: StockPurchaseDto[]
+  declare stocks: StockDto[]
+
+  constructor(user: User) {
+    this.id = user.id
+    this.fullName = user.fullName
+    this.email = user.email
+    this.password = user.password
+    this.createdAt = user.createdAt.toISO()!
+    this.updatedAt = user.updatedAt?.toISO()!
+    this.payees = PayeeDto.fromArray(user.payees)
+    this.transactions = TransactionDto.fromArray(user.transactions)
+    this.incomes = IncomeDto.fromArray(user.incomes)
+    this.stockPurchases = StockPurchaseDto.fromArray(user.stockPurchases)
+    this.stocks = StockDto.fromArray(user.stocks)
+  }
+
+  static fromArray(users: User[]) {
+    if (!users) return []
+    return users.map((user) => new UserDto(user))
+  }
+}
