@@ -4,7 +4,8 @@ export default class TestDto {
   declare id: number
   declare createdAt: string
 
-  constructor(test: Test) {
+  constructor(test?: Test) {
+    if (!test) return
     this.id = test.id
     this.createdAt = test.createdAt.toISO()!
   }

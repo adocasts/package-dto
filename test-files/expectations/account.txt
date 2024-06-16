@@ -29,7 +29,8 @@ export default class AccountDto {
   declare isBudgetable: boolean
   declare balanceDisplay: string
 
-  constructor(account: Account) {
+  constructor(account?: Account) {
+    if (!account) return
     this.id = account.id
     this.userId = account.userId
     this.accountTypeId = account.accountTypeId

@@ -2,7 +2,6 @@
 
 > Easily make and generate DTOs from Lucid Models
 
-
 [![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url]
 
 Converting Lucid Models to DTO files can be a tedious task. 
@@ -268,7 +267,8 @@ export default class AccountDto {
   declare isBudgetable: boolean
   declare balanceDisplay: string
 
-  constructor(account: Account) {
+  constructor(account?: Account) {
+    if (!account) return
     this.id = account.id
     this.userId = account.userId
     this.accountTypeId = account.accountTypeId

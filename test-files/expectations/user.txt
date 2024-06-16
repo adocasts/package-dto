@@ -18,7 +18,8 @@ export default class UserDto {
   declare stockPurchases: StockPurchaseDto[]
   declare stocks: StockDto[]
 
-  constructor(user: User) {
+  constructor(user?: User) {
+    if (!user) return
     this.id = user.id
     this.fullName = user.fullName
     this.email = user.email
