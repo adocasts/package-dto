@@ -1,3 +1,4 @@
+import { BaseModelDto } from '@adocasts.com/dto/base'
 import User from '#models/user'
 import PayeeDto from '#dtos/payee'
 import TransactionDto from '#dtos/transaction'
@@ -5,7 +6,7 @@ import IncomeDto from '#dtos/income'
 import StockPurchaseDto from '#dtos/stock_purchase'
 import StockDto from '#dtos/stock'
 
-export default class UserDto {
+export default class UserDto extends BaseModelDto {
   declare id: number
   declare fullName: string | null
   declare email: string
@@ -19,6 +20,8 @@ export default class UserDto {
   declare stocks: StockDto[]
 
   constructor(user?: User) {
+    super()
+
     if (!user) return
     this.id = user.id
     this.fullName = user.fullName
@@ -31,10 +34,5 @@ export default class UserDto {
     this.incomes = IncomeDto.fromArray(user.incomes)
     this.stockPurchases = StockPurchaseDto.fromArray(user.stockPurchases)
     this.stocks = StockDto.fromArray(user.stocks)
-  }
-
-  static fromArray(users: User[]) {
-    if (!users) return []
-    return users.map((user) => new UserDto(user))
   }
 }

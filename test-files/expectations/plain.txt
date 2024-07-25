@@ -1,0 +1,7 @@
+import { BaseDto } from '@adocasts.com/dto/base'
+
+export default class PlainDto extends BaseDto {
+  constructor() {
+    super()
+  }
+}

@@ -1,17 +1,15 @@
+import { BaseModelDto } from '@adocasts.com/dto/base'
 import Test from '#models/test'
 
-export default class SomeTestDto {
+export default class SomeTestDto extends BaseModelDto {
   declare id: number
   declare createdAt: string
 
   constructor(test?: Test) {
+    super()
+
     if (!test) return
     this.id = test.id
     this.createdAt = test.createdAt.toISO()!
-  }
-
-  static fromArray(tests: Test[]) {
-    if (!tests) return []
-    return tests.map((test) => new SomeTestDto(test))
   }
 }

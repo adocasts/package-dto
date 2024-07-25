@@ -16,8 +16,14 @@ test.group('MakeAction', (group) => {
     const command = await ace.create(MakeDto, ['Plain'])
     await command.exec()
 
+    const expectedContents = await fs.contents('expectations/plain.txt')
+
     command.assertLog('green(DONE:)    create app/dtos/plain.ts')
-    await assert.fileContains('app/dtos/plain.ts', 'export default class PlainDto {}')
+    await assert.fileContains(
+      'app/dtos/plain.ts',
+      'export default class PlainDto extends BaseDto {'
+    )
+    await assert.fileEquals('app/dtos/plain.ts', expectedContents.trim())
   })
 
   test('make a dto referencing a model', async ({ fs, assert }) => {
@@ -31,7 +37,10 @@ test.group('MakeAction', (group) => {
     const expectedContents = await fs.contents('expectations/test.txt')
 
     command.assertLog('green(DONE:)    create app/dtos/test.ts')
-    await assert.fileContains('app/dtos/test.ts', 'export default class TestDto {')
+    await assert.fileContains(
+      'app/dtos/test.ts',
+      'export default class TestDto extends BaseModelDto {'
+    )
     await assert.fileEquals('app/dtos/test.ts', expectedContents.trim())
   })
 
@@ -46,7 +55,10 @@ test.group('MakeAction', (group) => {
     const expectedContents = await fs.contents('expectations/some_test.txt')
 
     command.assertLog('green(DONE:)    create app/dtos/some_test.ts')
-    await assert.fileContains('app/dtos/some_test.ts', 'export default class SomeTestDto {')
+    await assert.fileContains(
+      'app/dtos/some_test.ts',
+      'export default class SomeTestDto extends BaseModelDto {'
+    )
     await assert.fileEquals('app/dtos/some_test.ts', expectedContents.trim())
   })
 
@@ -64,7 +76,10 @@ test.group('MakeAction', (group) => {
     const expectedContents = await fs.contents('expectations/account.txt')
 
     command.assertLog('green(DONE:)    create app/dtos/account.ts')
-    await assert.fileContains('app/dtos/account.ts', 'export default class AccountDto {')
+    await assert.fileContains(
+      'app/dtos/account.ts',
+      'export default class AccountDto extends BaseModelDto {'
+    )
     await assert.fileEquals('app/dtos/account.ts', expectedContents.trim())
   })
 
@@ -82,7 +97,10 @@ test.group('MakeAction', (group) => {
     const expectedContents = await fs.contents('expectations/user.txt')
 
     command.assertLog('green(DONE:)    create app/dtos/user.ts')
-    await assert.fileContains('app/dtos/user.ts', 'export default class UserDto {')
+    await assert.fileContains(
+      'app/dtos/user.ts',
+      'export default class UserDto extends BaseModelDto {'
+    )
     await assert.fileEquals('app/dtos/user.ts', expectedContents.trim())
   })
 })

@@ -4,41 +4,53 @@
 
 [![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url]
 
-Converting Lucid Models to DTO files can be a tedious task. 
+Converting Lucid Models to DTO files can be a tedious task.
 This package aims to make it a little less so
 by reading your model's property definitions and porting them to a DTO.
-Will it be perfect? Likely not, but it should help cut back on the 
+Will it be perfect? Likely not, but it should help cut back on the
 repetition needed to complete the task.
 
 ## Installation
+
 You can easily install and configure via the Ace CLI's `add` command.
+
 ```shell
 node ace add @adocasts.com/dto
 ```
+
 ##### Manual Install & Configure
+
 You can also manually install and configure if you'd prefer
+
 ```shell
 npm install @adocasts.com/dto
 ```
+
 ```shell
 node ace configure @adocasts.com/dto
 ```
 
 ##### Define DTO Import Path
-The generated DTOs will use `#dtos/*` for relationship imports within the DTOs. 
+
+The generated DTOs will use `#dtos/*` for relationship imports within the DTOs.
 As such, we recommend defining this import path within your `package.json`
+
 ```json
 "imports": {
   "#dtos/*": "./app/dtos/*.js"
 }
 ```
+
 ## Generate DTOs Command
+
 Want to generate DTOs for all your models in one fell swoop? This is the command for you!
+
 ```shell
 node ace generate:dtos
 ```
+
 This will read all of your model files, collecting their properties and types.
-It'll then convert those property's types into serialization-safe types 
+It'll then convert those property's types into serialization-safe types
 and relationships into their DTO representations.
 
 ```
@@ -73,15 +85,19 @@ File Tree                       Class
   - Note, if a file already exists at the DTOs determined location it will be skipped
 
 ## Make DTO Command
+
 Want to make a plain DTO file, or a single DTO from a single Model? This is the command for you!
 
 To make a DTO named `AccountDto` within a file located at `dto/account.ts`, we can run the following:
+
 ```shell
 node ace make:dto account
 ```
-This will check to see if there is a model named `Account`. 
+
+This will check to see if there is a model named `Account`.
 If a model is found, it will use that model's property definitions to generate the `AccountDto`.
 Otherwise, it'll generate just a `AccountDto` file with an empty class inside it.
+
 ```
 File Tree                       Class
 ------------------------------------------------
@@ -93,20 +109,103 @@ File Tree                       Class
 ```
 
 ### What If There Isn't An Account Model?
+
 As mentioned above, a plain `AccountDto` class will be generated within a new `dto/account.ts` file, which will look like the below.
+
 ```ts
 export default class AccountDto {}
 ```
 
 #### Specifying A Different Model
+
 If the DTO and Model names don't match, you can specify a specific Model to use via the `--model` flag.
+
 ```shell
 node ace make:dto account --model=main_account
 ```
-Now instead of looking for a model named `Account` it'll instead 
+
+Now instead of looking for a model named `Account` it'll instead
 look for `MainAccount` and use it to create a DTO named `AccountDto`.
 
+## BaseDto Helpers
+
+Newly added in v0.0.4, we now include either a `BaseDto` or `BaseModelDto` depeneding on whether we're generating your DTO from a model or not.
+Both of these bases include a helper called `fromArray`. With this, you can pass in an array of source objects.
+We'll then loop over them and pass each into a new constructor. This does run with the assumption that you'll populate properties within your DTO constructors.
+
+Here's a quick example
+
+```ts
+class Test extends BaseModel {
+  @column()
+  declare id: number
+}
+
+class TestDto extends BaseModelDto {
+  declare id: number
+
+  constructor(instance: Test) {
+    super()
+    this.id = instance.id
+  }
+}
+
+const tests = await Test.createMany([{ id: 1 }, { id: 2 }, { id: 3 }])
+
+const dtoArray = TestDto.fromArray(tests)
+// [TestDto, TestDto, TestDto]
+```
+
+Additionally, `BaseModelDto` also includes a `fromPaginator` helper. This allows you to pass in an instance of the `ModelPaginator` to be converted into a
+`SimplePaginatorDto` we have defined within this package. You can also pass in a URL range start and end and we'll generate those URLs for you during the conversion.
+
+Here's a simple example
+
+```ts
+class Test extends BaseModel {
+  @column()
+  declare id: number
+}
+
+class TestDto extends BaseModelDto {
+  declare id: number
+
+  constructor(instance: Test) {
+    super()
+    this.id = instance.id
+  }
+}
+
+const tests = await Test.createMany([{ id: 1 }, { id: 2 }, { id: 3 }])
+
+const paginator = await Test.query().paginate(1, 2)
+const paginatorDto = TestDto.fromPaginator(paginator, { start: 1, end: 2 })
+/**
+ * {
+ *    data: TestDto[],
+ *    meta: SimplePaginatorDtoMetaContract
+ * }
+ */
+
+const paginationUrls = paginatorDto.meta.pagesInRange
+/**
+ * [
+ *    {
+ *      url: '/?page=1',
+ *      page: 1,
+ *      isActive: true
+ *    },
+ *    {
+ *      url: '/?page=2',
+ *      page: 2,
+ *      isActive: false
+ *    },
+ * ]
+ */
+```
+
 ## Things To Note
+
 - At present we assume the Model's name from the file name of the model.
 - There is NOT currently a setting to change the output directory of the DTOs
 - Due to reflection limitations, we're reading Models as plaintext. I'm no TypeScript wiz, so if you know of a better approach, I'm all ears!
@@ -114,10 +213,12 @@ look for `MainAccount` and use it to create a DTO named `AccountDto`.
     - Currently we're omitting decorators and their options
 
 ## Example
-So, we've use account as our example throughout this guide, 
+
+So, we've use account as our example throughout this guide,
 so let's end by taking a look at what this Account Model looks like!
 
 ##### The Account Model
+
 ```ts
 // app/models/account.ts
 
@@ -220,22 +321,26 @@ export default class Account extends BaseModel {
 
   // endregion
 }
-
 ```
-It's got 
-- Column properties 
+
+It's got
+
+- Column properties
 - Nullable properties
 - An unmapped property, which also contains a default value
-- Getters 
+- Getters
 - Relationships
 
 Let's see what we get when we generate our DTO!
+
 ```shell
 node ace make:dto account
 ```
 
 ##### The Account DTO
+
 ```ts
+import { BaseModelDto } from '@adocasts.com/dto/base'
 import Account from '#models/account'
 import UserDto from '#dtos/user'
 import AccountTypeDto from '#dtos/account_type'
@@ -244,7 +349,7 @@ import StockDto from '#dtos/stock'
 import TransactionDto from '#dtos/transaction'
 import { AccountGroupConfig } from '#config/account'
 
-export default class AccountDto {
+export default class AccountDto extends BaseModelDto {
   declare id: number
   declare userId: number
   declare accountTypeId: number
@@ -268,6 +373,8 @@ export default class AccountDto {
   declare balanceDisplay: string
 
   constructor(account?: Account) {
+    super()
+
     if (!account) return
     this.id = account.id
     this.userId = account.userId
@@ -291,15 +398,11 @@ export default class AccountDto {
     this.isBudgetable = account.isBudgetable
     this.balanceDisplay = account.balanceDisplay
   }
-
-  static fromArray(accounts: Account[]) {
-    if (!accounts) return []
-    return accounts.map((account) => new AccountDto(account))
-  }
 }
 ```
 
 It's got the
+
 - Needed imports (it'll try to get them all by also referencing the Model's imports)
 - Column properties from our Model
 - Nullable property's nullability
@@ -310,12 +413,9 @@ It's got the
 - A helper method `fromArray` that'll normalize to an empty array if need be
 
 [gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adocasts/package-dto/test.yml?style=for-the-badge
-[gh-workflow-url]: https://github.com/adocasts/package-dto/actions/workflows/test.yml "Github action"
-
+[gh-workflow-url]: https://github.com/adocasts/package-dto/actions/workflows/test.yml 'Github action'
 [npm-image]: https://img.shields.io/npm/v/@adocasts.com/dto/latest.svg?style=for-the-badge&logo=npm
-[npm-url]: https://www.npmjs.com/package/@adocasts.com/dto/v/latest "npm"
-
+[npm-url]: https://www.npmjs.com/package/@adocasts.com/dto/v/latest 'npm'
 [typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
-
 [license-url]: LICENSE.md
 [license-image]: https://img.shields.io/github/license/adocasts/package-dto?style=for-the-badge

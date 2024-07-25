@@ -1,3 +1,4 @@
+import { BaseModelDto } from '@adocasts.com/dto/base'
 import Account from '#models/account'
 import UserDto from '#dtos/user'
 import AccountTypeDto from '#dtos/account_type'
@@ -6,7 +7,7 @@ import StockDto from '#dtos/stock'
 import TransactionDto from '#dtos/transaction'
 import { AccountGroupConfig } from '#config/account'
 
-export default class AccountDto {
+export default class AccountDto extends BaseModelDto {
   declare id: number
   declare userId: number
   declare accountTypeId: number
@@ -30,6 +31,8 @@ export default class AccountDto {
   declare balanceDisplay: string
 
   constructor(account?: Account) {
+    super()
+
     if (!account) return
     this.id = account.id
     this.userId = account.userId
@@ -52,10 +55,5 @@ export default class AccountDto {
     this.isCreditIncrease = account.isCreditIncrease
     this.isBudgetable = account.isBudgetable
     this.balanceDisplay = account.balanceDisplay
-  }
-
-  static fromArray(accounts: Account[]) {
-    if (!accounts) return []
-    return accounts.map((account) => new AccountDto(account))
   }
 }

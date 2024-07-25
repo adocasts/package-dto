@@ -1,6 +1,13 @@
+import { BaseDto } from '@adocasts.com/dto/base'
+
+export default class {{ dto.className }} extends BaseDto {
+  constructor() {
+    super()
+  }
+}
+
 {{{
   exports({
     to: dto.exportPath
   })
 }}}
-export default class {{ dto.className }} {}
