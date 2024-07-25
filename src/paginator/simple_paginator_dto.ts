@@ -1,4 +1,4 @@
-import { LucidRow } from '@adonisjs/lucid/types/model'
+import { LucidRow, ModelPaginatorContract } from '@adonisjs/lucid/types/model'
 import {
   SimplePaginatorDtoContract,
   SimplePaginatorDtoMetaContract,
@@ -8,7 +8,7 @@ import {
 import BaseDto from '../base/base_dto.js'
 import { SimplePaginatorContract } from '@adonisjs/lucid/types/querybuilder'
 
-export default class SimplePaginatorDto<Model extends LucidRow, Dto extends BaseDto>
+export default class SimplePaginatorDto<Model, Dto extends BaseDto>
   implements SimplePaginatorDtoContract<Dto>
 {
   declare data: Dto[]
@@ -17,12 +17,14 @@ export default class SimplePaginatorDto<Model extends LucidRow, Dto extends Base
   /**
    * Constructs a new instance of the SimplePaginatorDto class.
    *
-   * @param {SimplePaginatorContract<Model>} paginator - The paginator object containing the data.
+   * @param {SimplePaginatorContract<Model>|ModelPaginatorContract<Model>} paginator - The paginator object containing the data.
    * @param {StaticDto<Model, Dto>} dto - The static DTO class used to map the data.
    * @param {SimplePaginatorDtoMetaRange} [range] - Optional range for the paginator.
    */
   constructor(
-    paginator: SimplePaginatorContract<Model>,
+    paginator: Model extends LucidRow
+      ? ModelPaginatorContract<Model>
+      : SimplePaginatorContract<Model>,
     dto: StaticDto<Model, Dto>,
     range?: SimplePaginatorDtoMetaRange
   ) {
