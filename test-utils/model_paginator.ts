@@ -1,5 +1,5 @@
 import { SimplePaginator } from '@adonisjs/lucid/database'
-import { ModelPaginatorContract, CherryPick } from '@ioc:Adonis/Lucid/Orm'
+import { CherryPick, ModelPaginatorContract } from '@adonisjs/lucid/types/model'
 
 export class ModelPaginator extends SimplePaginator implements ModelPaginatorContract<any> {
   /**
