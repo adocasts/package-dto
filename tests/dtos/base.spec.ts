@@ -1,8 +1,8 @@
 import { test } from '@japa/runner'
 import { BaseDto, BaseModelDto } from '../../src/base/main.js'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
-// import { SimplePaginator } from '@adonisjs/lucid/database'
-// import SimplePaginatorDto from '../../src/paginator/simple_paginator_dto.js'
+import SimplePaginatorDto from '../../src/paginator/simple_paginator_dto.js'
+import { ModelPaginator } from '../../test-utils/model_paginator.js'
 
 test.group('Internal DTOs', (group) => {
   group.each.teardown(async ({ context }) => {
@@ -58,31 +58,31 @@ test.group('Internal DTOs', (group) => {
     dtoArray.map((dto) => assert.instanceOf(dto, TestDto))
   })
 
-  // test('should allow conversion to SimplePaginatorDto for Lucid Models', async ({ assert }) => {
-  //   class Test extends BaseModel {
-  //     @column()
-  //     declare id: number
-  //   }
+  test('should allow conversion to SimplePaginatorDto for Lucid Models', async ({ assert }) => {
+    class Test extends BaseModel {
+      @column()
+      declare id: number
+    }
 
-  //   class TestDto extends BaseModelDto {
-  //     declare id: number
-  //     constructor(instance: Test) {
-  //       super()
-  //       this.id = instance.id
-  //     }
-  //   }
+    class TestDto extends BaseModelDto {
+      declare id: number
+      constructor(instance: Test) {
+        super()
+        this.id = instance.id
+      }
+    }
 
-  //   const test1 = new Test().merge({ id: 1 })
-  //   const test2 = new Test().merge({ id: 2 })
-  //   const test3 = new Test().merge({ id: 3 })
+    const test1 = new Test().merge({ id: 1 })
+    const test2 = new Test().merge({ id: 2 })
+    const test3 = new Test().merge({ id: 3 })
 
-  //   const paginator = new SimplePaginator(3, 2, 1, test1, test2, test3)
-  //   const paginatorDto = TestDto.fromPaginator(paginator, { start: 1, end: 2 })
+    const paginator = new ModelPaginator(3, 2, 1, test1, test2, test3)
+    const paginatorDto = TestDto.fromPaginator(paginator, { start: 1, end: 2 })
 
-  //   assert.instanceOf(paginatorDto, SimplePaginatorDto)
-  //   assert.isArray(paginatorDto.data)
-  //   assert.lengthOf(paginatorDto.meta.pagesInRange!, 2)
+    assert.instanceOf(paginatorDto, SimplePaginatorDto)
+    assert.isArray(paginatorDto.data)
+    assert.lengthOf(paginatorDto.meta.pagesInRange!, 2)
 
-  //   paginatorDto.data.map((dto) => assert.instanceOf(dto, TestDto))
-  // })
+    paginatorDto.data.map((dto) => assert.instanceOf(dto, TestDto))
+  })
 })

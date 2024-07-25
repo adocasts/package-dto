@@ -204,6 +204,21 @@ const paginationUrls = paginatorDto.meta.pagesInRange
  */
 ```
 
+If, for example, you're using something like Inertia, you can then type your props accordingly
+
+```ts
+import { SimplePaginatorDtoContract } from '@adocasts.com/dto/types'
+import DifficultyDto from '#dtos/difficulty'
+
+const props = defineProps<{
+  paginated: SimplePaginatorDtoContract<DifficultyDto>
+}>()
+
+const rows = props.paginated.data
+const info = props.paginated.meta
+const urls = props.paginated.meta.pagesInRange
+```
+
 ## Things To Note
 
 - At present we assume the Model's name from the file name of the model.
