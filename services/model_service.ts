@@ -1,6 +1,7 @@
 import FileService from './file_service.js'
 import { generators } from '@adonisjs/core/app'
 import string from '@adonisjs/core/helpers/string'
+import { slash } from '@adonisjs/core/helpers'
 import { ApplicationService } from '@adonisjs/core/types'
 import { fsReadAll } from '@adonisjs/core/helpers'
 import UtilService from './util_service.js'
@@ -46,7 +47,7 @@ export default class ModelService {
     const modelsPath = this.app.modelsPath()
     const modelFilePaths = await fsReadAll(modelsPath, { pathType: 'absolute' })
     const promises = modelFilePaths.map(async (filePath) => {
-      const name = generators.modelName(filePath.split('/').pop()!)
+      const name = generators.modelName(slash(filePath).split('/').pop()!)
       return this.getModelInfo({ name, filePath }, name)
     })
 
