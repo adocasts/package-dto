@@ -1,7 +1,7 @@
 {
   "name": "@adocasts.com/dto",
   "description": "Easily make and generate DTOs from Lucid Models",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
     "node": ">=20.6.0"
   },
