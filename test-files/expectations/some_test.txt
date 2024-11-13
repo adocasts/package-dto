@@ -4,6 +4,7 @@ import Test from '#models/test'
 export default class SomeTestDto extends BaseModelDto {
   declare id: number
   declare createdAt: string
+  declare updatedAt: string
 
   constructor(test?: Test) {
     super()
@@ -11,5 +12,6 @@ export default class SomeTestDto extends BaseModelDto {
     if (!test) return
     this.id = test.id
     this.createdAt = test.createdAt.toISO()!
+    this.updatedAt = test.updatedAt.toISO()!
   }
 }

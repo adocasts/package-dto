@@ -26,7 +26,7 @@ export default class FileService {
     const classEndIndex = fileLines.findLastIndex((line) => string.condenseWhitespace(line) === '}')
 
     const classLines = fileLines
-      .slice(classStartIndex + 1, classEndIndex - 1)
+      .slice(classStartIndex + 1, classEndIndex)
       .map((line) => string.condenseWhitespace(line))
 
     let isInBlock: boolean = false
