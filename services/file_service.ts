@@ -32,7 +32,8 @@ export default class FileService {
     let isInBlock: boolean = false
     const definitions = classLines.filter((line) => {
       const propertyMatch = line.match(/^(declare |public |get |[0-9A-z])+/)
-      const isDefinition = propertyMatch && !isInBlock
+      const isStatic = line.startsWith('static ')
+      const isDefinition = propertyMatch && !isStatic && !isInBlock
 
       if (line.endsWith('{')) isInBlock = true
       if (line.startsWith('}') && isInBlock) isInBlock = false
