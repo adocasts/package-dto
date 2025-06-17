@@ -146,7 +146,7 @@ look for `MainAccount` and use it to create a DTO named `AccountDto`.
 Want to make a validator for a model? This command works similarly to the `make:dto` command:
 
 ```shell
-node ace make:dto:validator account
+node ace make:validators account
 ```
 
 This will check to see if there is a model named `Account`.
@@ -168,7 +168,7 @@ File Tree                       Variable
 Just like with DTOs, you can specify a different model:
 
 ```shell
-node ace make:dto:validator account --model=main_account
+node ace make:validators account --model=main_account
 ```
 
 ## Generate Validators Command
@@ -507,7 +507,7 @@ It's got the
 Let's see what we get when we generate a validator for our Account model:
 
 ```shell
-node ace make:dto:validator account
+node ace make:validator account
 ```
 
 ##### The Account Validator

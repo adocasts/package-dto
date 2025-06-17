@@ -26,29 +26,20 @@ test.group('GenerateValidators', (group) => {
       'app/validators/test.ts',
       'export const testValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/test.ts',
-      'import Test from \'#models/test\''
-    )
+    await assert.fileContains('app/validators/test.ts', "import Test from '#models/test'")
 
     // Check account validator content
     await assert.fileContains(
       'app/validators/account.ts',
       'export const accountValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/account.ts',
-      'import Account from \'#models/account\''
-    )
+    await assert.fileContains('app/validators/account.ts', "import Account from '#models/account'")
 
     // Check user validator content
     await assert.fileContains(
       'app/validators/user.ts',
       'export const userValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/user.ts',
-      'import User from \'#models/user\''
-    )
+    await assert.fileContains('app/validators/user.ts', "import User from '#models/user'")
   })
 })

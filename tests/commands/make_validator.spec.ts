@@ -36,10 +36,7 @@ test.group('MakeValidator', (group) => {
       'app/validators/test.ts',
       'export const testValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/test.ts',
-      'import Test from \'#models/test\''
-    )
+    await assert.fileContains('app/validators/test.ts', "import Test from '#models/test'")
   })
 
   test('make a validator referencing a model with a different name', async ({ fs, assert }) => {
@@ -55,16 +52,10 @@ test.group('MakeValidator', (group) => {
       'app/validators/some_test.ts',
       'export const someTestValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/some_test.ts',
-      'import Test from \'#models/test\''
-    )
+    await assert.fileContains('app/validators/some_test.ts', "import Test from '#models/test'")
   })
 
-  test('make a validator from a model with various property types', async ({
-    fs,
-    assert,
-  }) => {
+  test('make a validator from a model with various property types', async ({ fs, assert }) => {
     const ace = await new AceFactory().make(fs.baseUrl)
     await ace.app.init()
     ace.ui.switchMode('raw')
@@ -77,21 +68,12 @@ test.group('MakeValidator', (group) => {
       'app/validators/account.ts',
       'export const accountValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/account.ts',
-      'import Account from \'#models/account\''
-    )
+    await assert.fileContains('app/validators/account.ts', "import Account from '#models/account'")
 
     // Check for string validation
-    await assert.fileContains(
-      'app/validators/account.ts',
-      'name: vine.string().trim(),'
-    )
+    await assert.fileContains('app/validators/account.ts', 'name: vine.string().trim(),')
 
     // Check for optional validation
-    await assert.fileContains(
-      'app/validators/account.ts',
-      '.optional()'
-    )
+    await assert.fileContains('app/validators/account.ts', '.optional()')
   })
 })

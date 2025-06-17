@@ -24,7 +24,10 @@ test.group('ValidatorService', () => {
     assert.equal(validator.className, 'UserValidator')
     assert.equal(validator.variable, 'userValidator')
     assert.equal(validator.fileName, 'user')
-    assert.equal(validator.exportPath.replace(/\.\//g, '').replace('.ts', '').replace(/\/\//g, '/'), 'app/validators/user')
+    assert.equal(
+      validator.exportPath.replace(/\.\//g, '').replace('.ts', '').replace(/\/\//g, '/'),
+      'app/validators/user'
+    )
   })
 
   test('should normalize validator name', ({ assert }) => {

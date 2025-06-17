@@ -7,7 +7,7 @@ import { ImportService } from '../services/import_service.js'
 
 export default class GenerateValidators extends BaseCommand {
   static commandName = 'generate:validators'
-  static description = 'Reads, converts, and generates validators from all Lucid Models'
+  static description = 'Reads, converts, and generates vine validators from all Lucid Models'
   static options: CommandOptions = {
     strict: true,
   }

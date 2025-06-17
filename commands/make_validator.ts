@@ -6,8 +6,8 @@ import ModelService from '../services/model_service.js'
 import { ImportService } from '../services/import_service.js'
 
 export default class MakeValidator extends BaseCommand {
-  static commandName = 'make:dto:validator'
-  static description = 'Create a new validator'
+  static commandName = 'make:validators'
+  static description = 'Create a new vine validator'
   static options: CommandOptions = {
     strict: true,
   }

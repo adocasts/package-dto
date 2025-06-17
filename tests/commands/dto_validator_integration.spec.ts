@@ -10,7 +10,10 @@ test.group('DTO Validator Integration', (group) => {
     await context.fs.remove('app/validators')
   })
 
-  test('make:dto with validator flag should generate both DTO and validator', async ({ fs, assert }) => {
+  test('make:dto with validator flag should generate both DTO and validator', async ({
+    fs,
+    assert,
+  }) => {
     const ace = await new AceFactory().make(fs.baseUrl)
     await ace.app.init()
     ace.ui.switchMode('raw')
@@ -27,23 +30,20 @@ test.group('DTO Validator Integration', (group) => {
       'app/dtos/test.ts',
       'export default class TestDto extends BaseModelDto {'
     )
-    await assert.fileContains(
-      'app/dtos/test.ts',
-      'import Test from \'#models/test\''
-    )
+    await assert.fileContains('app/dtos/test.ts', "import Test from '#models/test'")
 
     // Check validator content
     await assert.fileContains(
       'app/validators/test.ts',
       'export const testValidator = vine.compile('
     )
-    await assert.fileContains(
-      'app/validators/test.ts',
-      'import Test from \'#models/test\''
-    )
+    await assert.fileContains('app/validators/test.ts', "import Test from '#models/test'")
   })
 
-  test('make:dto with validator flag should generate plain DTO and validator when model not found', async ({ fs, assert }) => {
+  test('make:dto with validator flag should generate plain DTO and validator when model not found', async ({
+    fs,
+    assert,
+  }) => {
     const ace = await new AceFactory().make(fs.baseUrl)
     await ace.app.init()
     ace.ui.switchMode('raw')
@@ -68,7 +68,10 @@ test.group('DTO Validator Integration', (group) => {
     )
   })
 
-  test('generate:dtos with validator flag should generate both DTOs and validators', async ({ fs, assert }) => {
+  test('generate:dtos with validator flag should generate both DTOs and validators', async ({
+    fs,
+    assert,
+  }) => {
     const ace = await new AceFactory().make(fs.baseUrl)
     await ace.app.init()
     ace.ui.switchMode('raw')
