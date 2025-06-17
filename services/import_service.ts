@@ -1,6 +1,22 @@
-import { DtoInfo, DtoProperty } from './dto_service.js'
 import string from '@adonisjs/core/helpers/string'
 import UtilService from './util_service.js'
+
+// Common interface for both DtoInfo and ValidatorInfo
+export type EntityInfo = {
+  entity: { path: string; name: string }
+  variable: string
+  className: string
+  fileName: string
+  exportPath: string
+  properties: EntityProperty[]
+}
+
+// Common interface for both DtoProperty and ValidatorProperty
+export type EntityProperty = {
+  name: string
+  type: string
+  typeRaw: any[]
+}
 
 export type ImportMap = {
   name: string
@@ -17,14 +33,14 @@ export type ImportLine = {
 
 export class ImportService {
   /**
-   * Get grouped import statements from generated DTO type information
-   * @param dto
+   * Get grouped import statements from generated entity type information
+   * @param entity Either a DtoInfo or ValidatorInfo object
    */
-  static getImportStatements(dto: DtoInfo, modelFileLines: string[]) {
+  static getImportStatements(entity: EntityInfo, modelFileLines: string[]) {
     const imports: ImportMap[] = []
     const importLines = this.#getImportFileLines(modelFileLines)
 
-    for (let property of dto.properties) {
+    for (let property of entity.properties) {
       // get imports for relationship DTOs
       for (let item of property.typeRaw) {
         if (item.isRelationship && item.dto) {
@@ -43,8 +59,8 @@ export class ImportService {
       }
     }
 
-    // don't try to import the DTO we're generating
-    const nonSelfReferencingImports = imports.filter((imp) => imp.name !== dto.className)
+    // don't try to import the entity we're generating
+    const nonSelfReferencingImports = imports.filter((imp) => imp.name !== entity.className)
 
     // join default and named imports into a single import statement for the namespace
     return this.#buildImportStatements(nonSelfReferencingImports)
@@ -109,7 +125,7 @@ export class ImportService {
     })
   }
 
-  static #findImportLineMatch(property: DtoProperty, lines: ImportLine[]) {
+  static #findImportLineMatch(property: EntityProperty, lines: ImportLine[]) {
     const types = property.type.split('|').map((type) => type.trim())
     const defaultMatch = lines.find((line) => types.includes(line.name))
 

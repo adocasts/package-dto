@@ -30,13 +30,13 @@ export default class DtoService {
    */
   getDtoInfo(name: string, model: ModelInfo) {
     const entity = generators.createEntity(this.#getDtoName(name))
-    const fileName = generators.modelFileName(entity.name).replace('_dto', '')
+    const fileName = generators.modelFileName(entity.name).replace('_dto', '').replace('.ts', '')
     const data: DtoInfo = {
       entity,
       fileName,
       className: generators.modelName(entity.name),
       variable: string.camelCase(name),
-      exportPath: this.app.makePath('app/dtos', entity.path, fileName),
+      exportPath: this.app.makePath('app/dtos', entity.path, fileName + '.ts'),
       properties: [],
     }
 
