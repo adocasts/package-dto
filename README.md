@@ -580,6 +580,7 @@ export default class AccountsController {
     }
   }
 }
+```
 
 [gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adocasts/package-dto/test.yml?style=for-the-badge
 [gh-workflow-url]: https://github.com/adocasts/package-dto/actions/workflows/test.yml 'Github action'
