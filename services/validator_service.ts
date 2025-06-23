@@ -1,7 +1,7 @@
 import { generators } from '@adonisjs/core/app'
-import type { ModelInfo, ModelProperty, ModelPropertyType } from './model_service.js'
 import string from '@adonisjs/core/helpers/string'
 import { ApplicationService } from '@adonisjs/core/types'
+import type { ModelInfo, ModelProperty, ModelPropertyType } from './model_service.js'
 
 export type ValidatorInfo = {
   entity: { path: string; name: string }
@@ -131,7 +131,7 @@ export default class ValidatorService {
     } else if (primaryType.type === 'Date') {
       rule = 'vine.date()'
     } else if (primaryType.type === 'DateTime') {
-      rule = 'vine.string().datetime()'
+      rule = 'vine.date({ formats: { utc: true } })'
     } else if (primaryType.type.includes('[]')) {
       rule = 'vine.array()'
     } else {

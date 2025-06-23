@@ -6,9 +6,8 @@ import {{ model.name }} from '#models/{{ string.snakeCase(model.name) }}'
 
 export const {{ validator.variable }} = vine.compile(
   vine.object({
-    {{ #each validator.properties as property }}
-    {{ property.name }}: {{{ property.validationRule }}},
-    {{ /each }}
+{{ #each validator.properties as property }}
+    {{ property.name }}: {{{ property.validationRule }}},{{ /each }}
   })
 )
 
