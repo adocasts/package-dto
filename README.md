@@ -1,6 +1,6 @@
 # @adocasts.com/dto
 
-> Easily make and generate DTOs from Lucid Models
+> Easily make and generate DTOs and validators from Lucid Models
 
 [![gh-workflow-image]][gh-workflow-url] [![npm-image]][npm-url] ![][typescript-image] [![license-image]][license-url]
 
@@ -53,6 +53,12 @@ This will read all of your model files, collecting their properties and types.
 It'll then convert those property's types into serialization-safe types
 and relationships into their DTO representations.
 
+You can also generate validators alongside DTOs by using the `--validator` flag:
+
+```shell
+node ace generate:dtos --validator
+```
+
 ```
 File Tree                       Class
 ------------------------------------------------
@@ -98,6 +104,14 @@ This will check to see if there is a model named `Account`.
 If a model is found, it will use that model's property definitions to generate the `AccountDto`.
 Otherwise, it'll generate just a `AccountDto` file with an empty class inside it.
 
+You can also generate a validator alongside the DTO by using the `--validator` flag:
+
+```shell
+node ace make:dto account --validator
+```
+
+This will create both a DTO and a validator for the Account model.
+
 ```
 File Tree                       Class
 ------------------------------------------------
@@ -126,6 +140,67 @@ node ace make:dto account --model=main_account
 
 Now instead of looking for a model named `Account` it'll instead
 look for `MainAccount` and use it to create a DTO named `AccountDto`.
+
+## Make Validator Command
+
+Want to make a validator for a model? This command works similarly to the `make:dto` command:
+
+```shell
+node ace make:validators account
+```
+
+This will check to see if there is a model named `Account`.
+If a model is found, it will use that model's property definitions to generate the `accountValidator`.
+Otherwise, it'll generate just a plain validator file with an empty schema.
+
+```
+File Tree                       Variable
+------------------------------------------------
+└── app/
+    ├── validators/
+    │   ├── account.ts          accountValidator
+    └── models/
+        ├── account.ts          Account
+```
+
+#### Specifying A Different Model
+
+Just like with DTOs, you can specify a different model:
+
+```shell
+node ace make:validators account --model=main_account
+```
+
+## Generate Validators Command
+
+Want to generate validators for all your models in one fell swoop? This command works similarly to `generate:dtos`:
+
+```shell
+node ace generate:validators
+```
+
+This will read all of your model files, collecting their properties and types.
+It'll then convert those property's types into VineJS validator rules.
+
+```
+File Tree                       Variable
+------------------------------------------------
+└── app/
+    ├── validators/
+    │   ├── account.ts          accountValidator
+    │   ├── account_group.ts    accountGroupValidator
+    │   ├── account_type.ts     accountTypeValidator
+    │   ├── income.ts           incomeValidator
+    │   ├── payee.ts            payeeValidator
+    │   └── user.ts             userValidator
+    └── models/
+        ├── account.ts          Account
+        ├── account_group.ts    AccountGroup
+        ├── account_type.ts     AccountType
+        ├── income.ts           Income
+        ├── payee.ts            Payee
+        └── user.ts             User
+```
 
 ## BaseDto Helpers
 
@@ -426,6 +501,85 @@ It's got the
 - Getters and their types, when specified. If types are inferred, the type will default to string or boolean if variable name starts with `is`
 - Constructor value setters for all of the above
 - A helper method `fromArray` that'll normalize to an empty array if need be
+
+## Example Validator
+
+Let's see what we get when we generate a validator for our Account model:
+
+```shell
+node ace make:validator account
+```
+
+##### The Account Validator
+
+```ts
+import vine from '@vinejs/vine'
+import Account from '#models/account'
+import { AccountGroupConfig } from '#config/account'
+
+export const accountValidator = vine.compile(
+  vine.object({
+    id: vine.number(),
+    userId: vine.number(),
+    accountTypeId: vine.number(),
+    name: vine.string().trim(),
+    note: vine.string().trim(),
+    dateOpened: vine.string().datetime().optional(),
+    dateClosed: vine.string().datetime().optional(),
+    balance: vine.number(),
+    startingBalance: vine.number(),
+    createdAt: vine.string().datetime(),
+    updatedAt: vine.string().datetime(),
+    user: vine.object({}),
+    accountType: vine.object({}),
+    payee: vine.object({}),
+    stocks: vine.array(vine.object({})),
+    transactions: vine.array(vine.object({})),
+    accountGroup: vine.object({}),
+    isCreditIncrease: vine.boolean(),
+    isBudgetable: vine.boolean(),
+    balanceDisplay: vine.string().trim()
+  })
+)
+```
+
+It's got:
+
+- Needed imports from the model
+- Validation rules for all model properties
+- Appropriate type conversions (e.g., DateTime to string().datetime())
+- Optional modifiers for nullable properties
+- Object and array validators for relationships
+
+## Using Generated Validators
+
+Once you've generated a validator, you can use it in your controllers or routes to validate incoming data:
+
+```typescript
+import { accountValidator } from '#validators/account'
+import { HttpContext } from '@adonisjs/core/http'
+
+export default class AccountsController {
+  async store({ request, response }: HttpContext) {
+    try {
+      // Validate the request data
+      const data = await accountValidator.validate(request.all())
+
+      // Create the account
+      const account = await Account.create(data)
+
+      // Return the account as a DTO
+      return response.created(new AccountDto(account))
+    } catch (error) {
+      // Handle validation errors
+      if (error.code === 'E_VALIDATION_ERROR') {
+        return response.unprocessableEntity(error.messages)
+      }
+
+      throw error
+    }
+  }
+}
 
 [gh-workflow-image]: https://img.shields.io/github/actions/workflow/status/adocasts/package-dto/test.yml?style=for-the-badge
 [gh-workflow-url]: https://github.com/adocasts/package-dto/actions/workflows/test.yml 'Github action'

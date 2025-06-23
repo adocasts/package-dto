@@ -1,0 +1,19 @@
+import vine from '@vinejs/vine'
+import {{ model.name }} from '#models/{{ string.snakeCase(model.name) }}'
+{{ #each imports as statement }}
+{{{ '\n' }}}{{ statement }}
+{{ /each }}
+
+export const {{ validator.variable }} = vine.compile(
+  vine.object({
+    {{ #each validator.properties as property }}
+    {{ property.name }}: {{{ property.validationRule }}},
+    {{ /each }}
+  })
+)
+
+{{{
+  exports({
+    to: validator.exportPath
+  })
+}}}

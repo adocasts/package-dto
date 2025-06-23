@@ -1,0 +1,13 @@
+import vine from '@vinejs/vine'
+
+export const {{ validator.variable }} = vine.compile(
+  vine.object({
+    // Add your validation rules here
+  })
+)
+
+{{{
+  exports({
+    to: validator.exportPath
+  })
+}}}
